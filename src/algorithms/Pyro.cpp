@@ -9,22 +9,15 @@ double Pyro::execute() {
 
     auto relation = ColumnLayoutRelationData::createFrom(inputGenerator_, configuration_.isNullEqualNull);
     auto schema = relation->getSchema();
-
-    /*for (auto col : schema->getColumns()) {
-        LOG(DEBUG) << boost::format{"PLI for %1%: %2%"}
-            % col->toString() % relation->getColumnData(col->getIndex())->getPositionListIndex()->toString();
-    }*/
-
-    auto profilingContext = std::make_shared<ProfilingContext>(
+    auto profilingContext = std::make_unique<ProfilingContext>(
             configuration_,
-            relation,
+            relation.get(),
             uccConsumer_,
             fdConsumer_,
             cachingMethod_,
             evictionMethod_,
             cachingMethodValue
             );
-
 
     std::function<bool(DependencyCandidate const&, DependencyCandidate const&)> launchPadOrder;
     if (configuration_.launchPadOrder == "arity") {
@@ -37,25 +30,23 @@ double Pyro::execute() {
 
     int nextId = 0;
     if (configuration_.isFindKeys) {
-        std::shared_ptr<DependencyStrategy> strategy;
+        std::unique_ptr<DependencyStrategy> strategy;
         if (configuration_.uccErrorMeasure == "g1prime") {
-            strategy = std::dynamic_pointer_cast<DependencyStrategy>(
-                    std::make_shared<KeyG1Strategy>(configuration_.maxUccError, configuration_.errorDev));
+            strategy = std::make_unique<KeyG1Strategy>(configuration_.maxUccError, configuration_.errorDev);
         } else {
             throw std::runtime_error("Unknown key error measure.");
         }
-        searchSpaces_.push_back(std::make_shared<SearchSpace>(nextId++, strategy, schema, launchPadOrder));
+        searchSpaces_.push_back(std::make_unique<SearchSpace>(nextId++, std::move(strategy), schema, launchPadOrder));
     }
     if (configuration_.isFindFds) {
-        for (auto rhs : schema->getColumns()) {
-            std::shared_ptr<DependencyStrategy> strategy;
+        for (auto& rhs : schema->getColumns()) {
+            std::unique_ptr<DependencyStrategy> strategy;
             if (configuration_.uccErrorMeasure == "g1prime") {
-                strategy = std::dynamic_pointer_cast<DependencyStrategy>(
-                        std::make_shared<FdG1Strategy>(rhs, configuration_.maxUccError, configuration_.errorDev));
+                strategy = std::make_unique<FdG1Strategy>(rhs.get(), configuration_.maxUccError, configuration_.errorDev);
             } else {
                 throw std::runtime_error("Unknown key error measure.");
             }
-            searchSpaces_.push_back(std::make_shared<SearchSpace>(nextId++, strategy, schema, launchPadOrder));
+            searchSpaces_.push_back(std::make_unique<SearchSpace>(nextId++, std::move(strategy), schema, launchPadOrder));
         }
     }
     unsigned long long initTimeMillis = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime).count();
@@ -65,7 +56,7 @@ double Pyro::execute() {
     unsigned long long totalAscension = 0;
     unsigned long long totalTrickle = 0;
     for (auto& searchSpace : searchSpaces_) {
-        searchSpace->setContext(profilingContext);
+        searchSpace->setContext(profilingContext.get());
         searchSpace->ensureInitialized();
         searchSpace->discover();
         searchSpace->printStats();
@@ -87,7 +78,7 @@ double Pyro::execute() {
     return elapsed_milliseconds.count();
 }
 
-Pyro::Pyro(fs::path const &path, char separator, bool hasHeader, int seed, double maxError, unsigned int maxLHS) :
+Pyro::Pyro(std::filesystem::path const &path, char separator, bool hasHeader, int seed, double maxError, unsigned int maxLHS) :
         inputGenerator_(path, separator, hasHeader),
         cachingMethod_(CachingMethod::COIN),
         evictionMethod_(CacheEvictionMethod::DEFAULT) {
