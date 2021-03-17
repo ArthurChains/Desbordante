@@ -14,42 +14,42 @@
 
 class LatticeVertex{
 private:
-  Vertical vertical;
-  // holds either an owned PLI (unique_ptr) or a non-owned one (const*)
-  std::variant<std::unique_ptr<PositionListIndex>, PositionListIndex const*> positionListIndex_;
-  boost::dynamic_bitset<> rhsCandidates;
-  bool isKeyCandidate = false;
-  std::vector<LatticeVertex const*> parents;
-  bool isInvalid = false;
+    Vertical vertical;
+    // holds either an owned PLI (unique_ptr) or a non-owned one (const*)
+    std::variant<std::unique_ptr<PositionListIndex>, PositionListIndex const*> positionListIndex_;
+    boost::dynamic_bitset<> rhsCandidates;
+    bool isKeyCandidate = false;
+    std::vector<LatticeVertex const*> parents;
+    bool isInvalid = false;
 
 public:
-  explicit LatticeVertex(Vertical _vertical) : vertical(std::move(_vertical)),
-    rhsCandidates(vertical.getSchema()->getNumColumns()) {}
+    explicit LatticeVertex(Vertical _vertical) : vertical(std::move(_vertical)),
+                                                 rhsCandidates(vertical.getSchema()->getNumColumns()) {}
 
-  std::vector<LatticeVertex const*>& getParents() { return parents; }
+    std::vector<LatticeVertex const*>& getParents() { return parents; }
 
-  Vertical const& getVertical() const { return vertical; }
-  boost::dynamic_bitset<>& getRhsCandidates() { return rhsCandidates; }
-  boost::dynamic_bitset<> const& getConstRhsCandidates() const { return rhsCandidates; }
+    Vertical const& getVertical() const { return vertical; }
+    boost::dynamic_bitset<>& getRhsCandidates() { return rhsCandidates; }
+    boost::dynamic_bitset<> const& getConstRhsCandidates() const { return rhsCandidates; }
 
-  void addRhsCandidates(std::vector<std::unique_ptr<Column>> const& candidates);
+    void addRhsCandidates(std::vector<std::unique_ptr<Column>> const& candidates);
 
-  bool comesBeforeAndSharePrefixWith(LatticeVertex const& that) const;
-  bool getIsKeyCandidate() const { return isKeyCandidate; }
-  void setKeyCandidate(bool m_isKeyCandidate) { isKeyCandidate = m_isKeyCandidate; }
-  bool getIsInvalid() const { return isInvalid; }
-  void setInvalid(bool m_isInvalid) { isInvalid = m_isInvalid; }
+    bool comesBeforeAndSharePrefixWith(LatticeVertex const& that) const;
+    bool getIsKeyCandidate() const { return isKeyCandidate; }
+    void setKeyCandidate(bool m_isKeyCandidate) { isKeyCandidate = m_isKeyCandidate; }
+    bool getIsInvalid() const { return isInvalid; }
+    void setInvalid(bool m_isInvalid) { isInvalid = m_isInvalid; }
 
-  PositionListIndex const* getPositionListIndex() const;
-  void setPositionListIndex(PositionListIndex const* positionListIndex)
+    PositionListIndex const* getPositionListIndex() const;
+    void setPositionListIndex(PositionListIndex const* positionListIndex)
     { positionListIndex_ = positionListIndex; }
-  void acquirePositionListIndex(std::unique_ptr<PositionListIndex> positionListIndex)
+    void acquirePositionListIndex(std::unique_ptr<PositionListIndex> positionListIndex)
     { positionListIndex_ = std::move(positionListIndex); }
 
     bool operator> (LatticeVertex const& that) const;
 
-  std::string toString();
+    std::string toString();
 
-  static bool comparator(LatticeVertex * v1, LatticeVertex * v2) { return *v2 > *v1; }
-  friend std::ostream& operator<<(std::ostream& os, LatticeVertex& lv);
+    static bool comparator(LatticeVertex * v1, LatticeVertex * v2) { return *v2 > *v1; }
+    friend std::ostream& operator<<(std::ostream& os, LatticeVertex& lv);
 };
