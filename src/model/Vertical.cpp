@@ -12,8 +12,8 @@ Vertical::Vertical(RelationalSchema const* relSchema, boost::dynamic_bitset<> in
     columnIndices.set(col.getIndex());
 }*/
 
-bool Vertical::contains(Vertical &that) const {
-    boost::dynamic_bitset<>& thatIndices = that.columnIndices;
+bool Vertical::contains(Vertical const& that) const {
+    boost::dynamic_bitset<> const& thatIndices = that.columnIndices;
     if (columnIndices.size() < thatIndices.size()) return false;
 
     for (size_t columnIndex = thatIndices.find_first();
@@ -24,8 +24,8 @@ bool Vertical::contains(Vertical &that) const {
     return true;
 }
 
-bool Vertical::intersects(Vertical &that) const {
-    boost::dynamic_bitset<>& thatIndices = that.columnIndices;
+bool Vertical::intersects(Vertical const& that) const {
+    boost::dynamic_bitset<> const& thatIndices = that.columnIndices;
     return columnIndices.intersects(thatIndices);
 }
 
@@ -35,13 +35,13 @@ Vertical Vertical::Union(Vertical const &that) const {
     return schema->getVertical(retainedColumnIndices);
 }
 
-Vertical Vertical::project(Vertical &that) const {
+Vertical Vertical::project(Vertical const& that) const {
     boost::dynamic_bitset<> retainedColumnIndices(columnIndices);
     retainedColumnIndices &= that.columnIndices;
     return schema->getVertical(retainedColumnIndices);
 }
 
-Vertical Vertical::without(Vertical const & that) const {
+Vertical Vertical::without(Vertical const& that) const {
     boost::dynamic_bitset<> retainedColumnIndices(columnIndices);
     retainedColumnIndices &= ~that.columnIndices;
     return schema->getVertical(retainedColumnIndices);
@@ -54,7 +54,7 @@ Vertical Vertical::invert() const {
     return schema->getVertical(flippedIndices);
 }
 
-Vertical Vertical::invert(Vertical &scope) const {
+Vertical Vertical::invert(Vertical const& scope) const {
     boost::dynamic_bitset<> flippedIndices(columnIndices);
     flippedIndices ^= scope.columnIndices;
     return schema->getVertical(flippedIndices);
