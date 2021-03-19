@@ -27,7 +27,7 @@ public:
 
     Vertical(RelationalSchema const* relSchema, boost::dynamic_bitset<> indices);
     Vertical() = default;
-    //explicit Vertical(Column & col);
+    explicit Vertical(Column const& col);
 
     //Vertical(Vertical& other) = default;
     Vertical(Vertical const& other) = default;

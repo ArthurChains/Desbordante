@@ -29,5 +29,5 @@ public:
     explicit operator std::string() const { return toString(); }
     explicit operator Vertical() const;
 
-    bool operator==(const Column& rhs);
+    bool operator==(const Column& rhs) const;
 };

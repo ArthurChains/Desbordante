@@ -1,7 +1,3 @@
-//
-// Created by maxim on 18.10.2019.
-//
-
 #include <iostream>
 
 #include "gmock/gmock.h"
@@ -28,7 +24,7 @@ TEST(TaneTester, first) {
                                "WDC_science.csv",
                                "WDC_symbols.csv",
                                "WDC_kepler.csv"};
-    auto path = fs::current_path().append("inputData");
+    auto path = filesystem::current_path().append("inputData");
     vector<long> results;
     try {
         /*for (int i = 0; i < datasets.size(); i++) {

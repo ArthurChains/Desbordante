@@ -21,8 +21,6 @@ private:
     std::string name;
     bool isNullEqNull;
 
-
-
 public:
     std::unique_ptr<Vertical> emptyVertical;
 
@@ -41,4 +39,6 @@ public:
 
     std::unordered_set<Vertical> calculateHittingSet(std::vector<Vertical> verticals,
             boost::optional<std::function<bool (Vertical const&)>> pruningFunction) const;
+
+    ~RelationalSchema();
 };

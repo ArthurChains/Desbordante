@@ -7,10 +7,10 @@ Vertical::Vertical(RelationalSchema const* relSchema, boost::dynamic_bitset<> in
     columnIndices(std::move(indices)),
     schema(relSchema) {}
 
-/*Vertical::Vertical(Column & col) : schema(col.getSchema()){
-    columnIndices = dynamic_bitset<>(schema.lock()->getNumColumns());
+Vertical::Vertical(Column const & col) : schema(col.getSchema()){
+    columnIndices = boost::dynamic_bitset<>(schema->getNumColumns());
     columnIndices.set(col.getIndex());
-}*/
+}
 
 bool Vertical::contains(Vertical const& that) const {
     boost::dynamic_bitset<> const& thatIndices = that.columnIndices;

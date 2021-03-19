@@ -1,5 +1,3 @@
-//#include "Pyro.h"
-
 #include <iostream>
 
 #include "gmock/gmock.h"
@@ -32,7 +30,7 @@ TEST(PyroTester, first) {
                                };
     // crashes if \r is the newline character
     // string data = "CIPublicHighway50k.csv";
-    auto path = fs::current_path().append("inputData");
+    auto path = filesystem::current_path().append("inputData");
     //CSVParser csvParser(path + "/TestTane.csv");
     //cout << path;
     try {

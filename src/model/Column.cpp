@@ -4,7 +4,7 @@
 
 using namespace std;
 
-bool Column::operator==(const Column &rhs) {
+bool Column::operator==(const Column &rhs) const {
     if (this == &rhs) return true;
     return index == rhs.index && schema == rhs.schema;
 }
